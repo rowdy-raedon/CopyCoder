@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid"
 // Mock user type
 export interface User {
   id: string
-  username: string
   email: string
   role: "user" | "admin"
 }
@@ -12,28 +11,73 @@ export interface User {
 class AuthService {
   private currentUser: User | null = null
   private isAuthenticated = false
+  private verificationCodes: Map<string, string> = new Map()
 
-  // Mock KeyAuth integration
-  async login(username: string, password: string): Promise<{ success: boolean; message?: string; user?: User }> {
+  // Step 1: Request email login
+  async requestEmailLogin(email: string): Promise<{ success: boolean; message?: string }> {
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 800))
 
-    // For demo purposes, accept any non-empty username/password
-    if (!username || !password) {
-      return { success: false, message: "Username and password are required" }
+    if (!email || !this.isValidEmail(email)) {
+      return { success: false, message: "Please enter a valid email address" }
     }
 
-    // Demo credentials (in a real app, this would be validated against KeyAuth)
-    if (password.length < 6) {
-      return { success: false, message: "Password must be at least 6 characters" }
+    // Generate a verification code (in a real app, this would be sent via email)
+    const verificationCode = this.generateVerificationCode()
+    this.verificationCodes.set(email, verificationCode)
+
+    // In a real app, you would send an email here
+    console.log(`Verification code for ${email}: ${verificationCode}`)
+
+    return {
+      success: true,
+      message: "Verification email sent! Check your inbox.",
+    }
+  }
+
+  // Step 2: Verify the code and log in
+  async verifyEmailLogin(email: string, code: string): Promise<{ success: boolean; message?: string; user?: User }> {
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 600))
+
+    const storedCode = this.verificationCodes.get(email)
+
+    if (!storedCode || storedCode !== code) {
+      return { success: false, message: "Invalid verification code" }
     }
 
-    // Create mock user
+    // Clear the verification code
+    this.verificationCodes.delete(email)
+
+    // Create user
+    const isAdmin = email.includes("admin") || email.includes("rowdy")
     const user: User = {
       id: uuidv4(),
-      username,
-      email: `${username.toLowerCase()}@example.com`,
-      role: username.toLowerCase() === "admin" ? "admin" : "user",
+      email,
+      role: isAdmin ? "admin" : "user",
+    }
+
+    // Set authenticated state
+    this.currentUser = user
+    this.isAuthenticated = true
+
+    // Save to session storage for persistence
+    this.saveSession(user)
+
+    return { success: true, user }
+  }
+
+  // For demo purposes, auto-verify without email
+  async autoVerifyForDemo(email: string): Promise<{ success: boolean; user?: User }> {
+    // Simulate API call delay
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // Create user
+    const isAdmin = email.includes("admin") || email.includes("rowdy")
+    const user: User = {
+      id: uuidv4(),
+      email,
+      role: isAdmin ? "admin" : "user",
     }
 
     // Set authenticated state
@@ -90,8 +134,18 @@ class AuthService {
       // Save user to session storage
       sessionStorage.setItem("auth_user", JSON.stringify(user))
       // Mock auth token
-      sessionStorage.setItem("auth_token", `mock-token-${uuidv4()}`)
+      sessionStorage.setItem("auth_token", `email-login-token-${uuidv4()}`)
     }
+  }
+
+  private generateVerificationCode(): string {
+    // Generate a 6-digit code
+    return Math.floor(100000 + Math.random() * 900000).toString()
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
   }
 }
 
