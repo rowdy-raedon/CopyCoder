@@ -7,20 +7,13 @@ import { Toaster } from "@/components/ui/toaster"
 // Simple type definitions
 type Theme = "dark" | "light"
 
-interface UploadedFile {
-  id: string
-  name: string
-  url: string
-  size: number
-  type: string
-}
-
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { MultiFileUpload } from "@/components/multi-file-upload"
 import { QuickTools } from "@/components/quick-tools"
 import { PromptDisplay } from "@/components/prompt-display"
 import { ControlPanel } from "@/components/control-panel"
+import { ProjectInfoForm, type ProjectInfo } from "@/components/project-info-form"
 import type { UploadedImage, GeneratedPrompt, AnalysisSettings } from "@/types"
 import { generatePrompt } from "@/lib/prompt-generator"
 
@@ -30,6 +23,12 @@ export default function Home() {
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([])
   const [generatedPrompt, setGeneratedPrompt] = useState<GeneratedPrompt | null>(null)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [projectInfo, setProjectInfo] = useState<ProjectInfo>({
+    name: "",
+    author: "",
+    description: "",
+    customPrompt: "",
+  })
 
   const { toast } = useToast()
 
@@ -53,6 +52,11 @@ export default function Home() {
   // Handle images change
   const handleImagesChange = useCallback((images: UploadedImage[]) => {
     setUploadedImages(images)
+  }, [])
+
+  // Handle project info change
+  const handleProjectInfoChange = useCallback((info: ProjectInfo) => {
+    setProjectInfo(info)
   }, [])
 
   // Generate prompt
@@ -82,8 +86,8 @@ export default function Home() {
       setGeneratedPrompt(null)
 
       try {
-        // Generate prompt based on all uploaded images
-        const prompt = await generatePrompt(uploadedImages, settings)
+        // Generate prompt based on all uploaded images and project info
+        const prompt = await generatePrompt(uploadedImages, settings, projectInfo)
         setGeneratedPrompt(prompt)
 
         toast({
@@ -101,7 +105,7 @@ export default function Home() {
         setIsGenerating(false)
       }
     },
-    [uploadedImages, toast],
+    [uploadedImages, toast, projectInfo],
   )
 
   return (
@@ -113,7 +117,10 @@ export default function Home() {
           {/* Left Panel - 3 columns */}
           <div className="lg:col-span-3 space-y-6">
             {/* Multi-File Upload Area */}
-            <MultiFileUpload onImagesChange={handleImagesChange} maxFiles={10} />
+            <MultiFileUpload onImagesChange={handleImagesChange} maxFiles={50} />
+
+            {/* Project Information Form */}
+            <ProjectInfoForm onInfoChange={handleProjectInfoChange} />
 
             {/* Quick Access Tools */}
             <QuickTools />

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { X, ChevronLeft, ChevronRight, Loader2, AlertCircle, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -19,10 +19,22 @@ interface ImageGalleryProps {
 export function ImageGallery({ images, onRemove, onClearAll, className }: ImageGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0)
 
+  // Reset activeIndex when images change
+  useEffect(() => {
+    if (activeIndex >= images.length && images.length > 0) {
+      setActiveIndex(0)
+    }
+  }, [images, activeIndex])
+
   // If there are no images, don't render anything
   if (images.length === 0) return null
 
-  const activeImage = images[activeIndex]
+  // Make sure activeIndex is valid
+  const safeActiveIndex = Math.min(activeIndex, images.length - 1)
+  const activeImage = images[safeActiveIndex]
+
+  // Safety check - if somehow activeImage is undefined, don't render
+  if (!activeImage) return null
 
   const goToNext = () => {
     setActiveIndex((prev) => (prev + 1) % images.length)
@@ -140,7 +152,7 @@ export function ImageGallery({ images, onRemove, onClearAll, className }: ImageG
               key={image.id}
               className={cn(
                 "relative h-16 w-16 rounded-md overflow-hidden flex-shrink-0 border-2",
-                activeIndex === index ? "border-blue-500" : "border-transparent hover:border-blue-500/50",
+                safeActiveIndex === index ? "border-blue-500" : "border-transparent hover:border-blue-500/50",
               )}
               onClick={() => setActiveIndex(index)}
             >

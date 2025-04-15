@@ -14,7 +14,7 @@ interface MultiFileUploadProps {
   className?: string
 }
 
-export function MultiFileUpload({ onImagesChange, maxFiles = 10, className }: MultiFileUploadProps) {
+export function MultiFileUpload({ onImagesChange, maxFiles = 50, className }: MultiFileUploadProps) {
   const {
     images,
     isDragging,

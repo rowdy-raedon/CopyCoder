@@ -7,7 +7,7 @@ import { useToast } from "@/components/ui/use-toast"
 import type { UploadedImage } from "@/types"
 import { validateFile, createUploadedImage, simulateImageUpload, revokeImageUrls } from "@/lib/image-utils"
 
-export function useMultiFileUpload(maxFiles = 10) {
+export function useMultiFileUpload(maxFiles = 50) {
   const [images, setImages] = useState<UploadedImage[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const { toast } = useToast()
@@ -17,7 +17,7 @@ export function useMultiFileUpload(maxFiles = 10) {
     return () => {
       revokeImageUrls(images)
     }
-  }, [])
+  }, [images])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()

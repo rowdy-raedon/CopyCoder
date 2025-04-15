@@ -1,25 +1,43 @@
 import { v4 as uuidv4 } from "uuid"
 import type { GeneratedPrompt, UploadedImage, AnalysisSettings } from "@/types"
+import type { ProjectInfo } from "@/components/project-info-form"
 
-// Generate a more advanced prompt based on multiple images
-export async function generatePrompt(images: UploadedImage[], settings: AnalysisSettings): Promise<GeneratedPrompt> {
+// Generate a more advanced prompt based on multiple images and project info
+export async function generatePrompt(
+  images: UploadedImage[],
+  settings: AnalysisSettings,
+  projectInfo: ProjectInfo,
+): Promise<GeneratedPrompt> {
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 2500))
 
   // Get image IDs
   const imageIds = images.map((img) => img.id)
 
+  // Get project info with fallbacks
+  const projectName = projectInfo.name || "Unnamed Project"
+  const authorName = projectInfo.author || "Anonymous"
+  const projectDescription = projectInfo.description || "A web application"
+  const customPromptText = projectInfo.customPrompt || ""
+
   // Generate content based on settings and number of images
   const imageCount = images.length
   const imageText = imageCount === 1 ? "the uploaded mockup" : `the ${imageCount} uploaded mockups`
 
-  // Create a more detailed prompt with multi-image awareness
-  const content = `# UI Implementation Specification for ${settings.analysisFocus}
+  // Create a more detailed prompt with multi-image awareness and custom project info
+  const content = `# UI Implementation Specification for ${projectName}
 
 ## Overview
-Create a modern web application with a dark-themed UI as shown in ${imageText}. The application is a prompt generator tool called "CopyCoder" by RowdyRaedon.
+Create a modern web application with a dark-themed UI as shown in ${imageText}. The application is ${projectDescription} by ${authorName}.
 
 ${
+  customPromptText
+    ? `## Custom Requirements
+${customPromptText}
+
+`
+    : ""
+}${
   imageCount > 1
     ? `## Image Analysis Summary
 ${images.map((img, i) => `- **Image ${i + 1}**: ${img.name} - ${getRandomAnalysis(settings.analysisFocus)}`).join("\n")}

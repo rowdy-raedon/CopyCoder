@@ -24,3 +24,23 @@ export interface AnalysisSettings {
   analysisFocus: string
   processingOption: string
 }
+
+export interface AppState {
+  currentFile: UploadedImage | null
+  currentPrompt: GeneratedPrompt | null
+  isGenerating: boolean
+  settings: AppSettings
+  history: {
+    files: UploadedImage[]
+    prompts: GeneratedPrompt[]
+  }
+}
+
+export interface AppSettings {
+  theme: Theme
+  temperature: number
+  analysisFocus: string
+  processingOption: string
+}
+
+export type UploadedFile = UploadedImage

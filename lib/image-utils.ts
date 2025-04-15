@@ -4,7 +4,11 @@ import type { UploadedImage } from "@/types"
 // Maximum file size (10MB)
 export const MAX_FILE_SIZE = 10 * 1024 * 1024
 
-// Validate file before upload
+/**
+ * Validates a file before upload
+ * @param file The file to validate
+ * @returns An object with valid flag and optional error message
+ */
 export function validateFile(file: File): { valid: boolean; message?: string } {
   // Check file size
   if (file.size > MAX_FILE_SIZE) {
@@ -19,21 +23,11 @@ export function validateFile(file: File): { valid: boolean; message?: string } {
   return { valid: true }
 }
 
-// Create uploaded image object
-export function createUploadedImage(file: File): UploadedImage {
-  return {
-    id: uuidv4(),
-    name: file.name,
-    url: URL.createObjectURL(file),
-    size: file.size,
-    type: file.type,
-    uploadedAt: new Date(),
-    progress: 100, // For client-side only, we set to 100% immediately
-    status: "complete",
-  }
-}
-
-// Format file size to human readable format
+/**
+ * Formats file size to human readable format
+ * @param bytes Size in bytes
+ * @returns Formatted string (e.g., "5.2 MB")
+ */
 export function formatFileSize(bytes: number): string {
   if (bytes === 0) return "0 Bytes"
 
@@ -44,9 +38,32 @@ export function formatFileSize(bytes: number): string {
   return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
 }
 
-// Simulate image upload with progress
+/**
+ * Creates an uploaded image object
+ * @param file The file to create an image object from
+ * @returns UploadedImage object
+ */
+export function createUploadedImage(file: File): UploadedImage {
+  return {
+    id: uuidv4(),
+    name: file.name,
+    url: URL.createObjectURL(file),
+    size: file.size,
+    type: file.type,
+    uploadedAt: new Date(),
+    progress: 100,
+    status: "complete",
+  }
+}
+
+/**
+ * Simulates image upload with progress
+ * @param file The file to upload
+ * @param onProgress Callback for progress updates
+ * @returns Promise with the image URL
+ */
 export async function simulateImageUpload(file: File, onProgress: (progress: number) => void): Promise<string> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let progress = 0
     const interval = setInterval(() => {
       progress += Math.random() * 15
@@ -62,7 +79,10 @@ export async function simulateImageUpload(file: File, onProgress: (progress: num
   })
 }
 
-// Clean up object URLs to prevent memory leaks
+/**
+ * Revokes object URLs to prevent memory leaks
+ * @param images Array of uploaded images
+ */
 export function revokeImageUrls(images: UploadedImage[]): void {
   images.forEach((image) => {
     if (image.url.startsWith("blob:")) {
@@ -71,7 +91,12 @@ export function revokeImageUrls(images: UploadedImage[]): void {
   })
 }
 
-// Resize image for preview (returns a promise with the resized image URL)
+/**
+ * Resizes an image for preview
+ * @param file The file to resize
+ * @param maxWidth Maximum width for the resized image
+ * @returns Promise with the resized image URL
+ */
 export function resizeImageForPreview(file: File, maxWidth = 800): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
