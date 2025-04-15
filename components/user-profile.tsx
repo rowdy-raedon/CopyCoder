@@ -1,7 +1,8 @@
 "use client"
+
 import { LogOut, User, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { authService, type User as UserType } from "@/lib/auth-service"
+import { logoutUser } from "@/app/actions/auth-actions"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,17 +13,17 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 interface UserProfileProps {
-  user: UserType
+  user: any
   onLogout: () => void
 }
 
 export function UserProfile({ user, onLogout }: UserProfileProps) {
-  const handleLogout = () => {
-    authService.logout()
+  const handleLogout = async () => {
+    await logoutUser()
     onLogout()
   }
 
-  // Get first part of email for display
+  // Get display name from email
   const displayName = user.email.split("@")[0]
 
   return (
