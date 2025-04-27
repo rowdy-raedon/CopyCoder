@@ -1,6 +1,12 @@
 import type React from "react"
 import "./globals.css"
 
+// Force static rendering
+export const dynamic = "force-static"
+
+// Disable revalidation
+export const revalidate = false
+
 export const metadata = {
   title: "CopyCoder by RowdyRaedon",
   description: "AI-powered prompt generator for UI screenshots and mockups",

@@ -1,27 +1,25 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Use static HTML export
   output: "export",
+
+  // Disable image optimization for static export
   images: {
     unoptimized: true,
   },
-  // Disable static optimization to prevent SSR issues
+
+  // Disable strict mode for development
+  reactStrictMode: false,
+
+  // Enable minification
+  swcMinify: true,
+
   eslint: {
     ignoreDuringBuilds: true,
   },
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Explicitly exclude API routes
-  experimental: {
-    appDir: true,
-  },
-  // Explicitly define which paths to include in the static export
-  exportPathMap: async () => ({
-    "/": { page: "/" },
-  }),
-  // Disable server components
-  reactStrictMode: true,
-  swcMinify: true,
 }
 
 module.exports = nextConfig

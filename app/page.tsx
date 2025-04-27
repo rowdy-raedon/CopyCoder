@@ -1,3 +1,14 @@
+// Force static rendering
+export const dynamic = "force-static"
+
+// Disable revalidation
+export const revalidate = false
+
+// Generate only the root page
+export function generateStaticParams() {
+  return [{}]
+}
+
 export default function Page() {
   return (
     <div id="app-root" className="min-h-screen bg-[#0f1117]">

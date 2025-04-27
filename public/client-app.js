@@ -1,4 +1,4 @@
-// This file is loaded by the script in page.tsx
+// This file is loaded by the script in index.js
 console.log("Initializing client app...")
 
 // Initialize the app
@@ -25,7 +25,7 @@ function initApp() {
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-4 group">
         <div class="relative h-9 w-9 overflow-hidden rounded-full ring-1 ring-white/10">
-          <img src="/images/logo.png" alt="RowdyRaedon Logo" width="36" height="36" class="object-cover" onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'white\\' stroke-width=\\'2\\' stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\'%3E%3Ccircle cx=\\'12\\' cy=\\'8\\' r=\\'5\\'/%3E%3Cpath d=\\'M20 21v-2a5 5 0 0 0-5-5H9a5 5 0 0 0-5 5v2\\'/%3E%3C/svg%3E';" />
+          <div class="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold">C</div>
         </div>
         <div class="flex flex-col">
           <span class="text-xl font-semibold tracking-tight">CopyCoder</span>
@@ -81,7 +81,7 @@ function initApp() {
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-3">
           <div class="relative h-7 w-7 overflow-hidden rounded-full ring-1 ring-white/10">
-            <img src="/images/logo.png" alt="RowdyRaedon Logo" width="28" height="28" class="object-cover" onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'white\\' stroke-width=\\'2\\' stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\'%3E%3Ccircle cx=\\'12\\' cy=\\'8\\' r=\\'5\\'/%3E%3Cpath d=\\'M20 21v-2a5 5 0 0 0-5-5H9a5 5 0 0 0-5 5v2\\'/%3E%3C/svg%3E';" />
+            <div class="w-full h-full bg-blue-600 flex items-center justify-center text-white font-bold">C</div>
           </div>
           <p class="text-sm text-gray-500">© ${new Date().getFullYear()} CopyCoder by RowdyRaedon</p>
         </div>
