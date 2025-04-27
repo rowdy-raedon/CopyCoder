@@ -1,6 +1,15 @@
 // This file is loaded by the script in index.js
 console.log("Initializing client app...")
 
+// Global state for loaders
+const loaderState = {
+  isLoading: false,
+  progressValue: 0,
+  progressInterval: null,
+  currentMessage: "Loading...",
+  currentSubMessage: "Please wait while we prepare your experience",
+}
+
 // Initialize the app
 function initApp() {
   // Get the app root element
@@ -17,6 +26,15 @@ function initApp() {
   const appContainer = document.createElement("div")
   appContainer.className = "min-h-screen bg-[#0f1117] text-white"
   appRoot.appendChild(appContainer)
+
+  // Add progress bar
+  const progressBar = document.createElement("div")
+  progressBar.className = "progress-bar"
+  progressBar.setAttribute("role", "progressbar")
+  progressBar.setAttribute("aria-valuenow", "0")
+  progressBar.setAttribute("aria-valuemin", "0")
+  progressBar.setAttribute("aria-valuemax", "100")
+  document.body.appendChild(progressBar)
 
   // Create the header
   const header = document.createElement("header")
@@ -95,26 +113,261 @@ function initApp() {
   `
   appContainer.appendChild(footer)
 
-  // Add event listeners
-  document.getElementById("theme-toggle")?.addEventListener("click", () => {
-    const isDarkMode = document.documentElement.classList.contains("dark")
-    if (isDarkMode) {
-      document.documentElement.classList.remove("dark")
-      document.documentElement.style.colorScheme = "light"
-    } else {
-      document.documentElement.classList.add("dark")
-      document.documentElement.style.colorScheme = "dark"
+  // Create the loader container
+  createLoaderElements()
+
+  // Add event listeners with optimized performance
+  addOptimizedEventListeners()
+
+  // Simulate initial loading completion
+  simulateInitialLoading()
+}
+
+// Create loader elements
+function createLoaderElements() {
+  // Create full-screen loader
+  const loaderContainer = document.createElement("div")
+  loaderContainer.className = "loader-container"
+  loaderContainer.setAttribute("role", "alert")
+  loaderContainer.setAttribute("aria-live", "polite")
+  loaderContainer.innerHTML = `
+    <div class="loader">
+      <div class="loader-circle"></div>
+      <div class="loader-circle"></div>
+      <div class="loader-circle"></div>
+    </div>
+    <div class="loader-text" id="loader-text">Loading...</div>
+    <div class="loader-subtext" id="loader-subtext">Please wait while we prepare your experience</div>
+  `
+  document.body.appendChild(loaderContainer)
+}
+
+// Show the loader with custom messages
+function showLoader(message = "Loading...", subMessage = "Please wait while we prepare your experience") {
+  const loaderContainer = document.querySelector(".loader-container")
+  const loaderText = document.getElementById("loader-text")
+  const loaderSubtext = document.getElementById("loader-subtext")
+
+  if (loaderContainer && loaderText && loaderSubtext) {
+    loaderState.isLoading = true
+    loaderState.currentMessage = message
+    loaderState.currentSubMessage = subMessage
+
+    loaderText.textContent = message
+    loaderSubtext.textContent = subMessage
+    loaderContainer.classList.add("active")
+
+    // Start progress bar animation
+    startProgressBar()
+  }
+}
+
+// Hide the loader
+function hideLoader() {
+  const loaderContainer = document.querySelector(".loader-container")
+
+  if (loaderContainer) {
+    loaderState.isLoading = false
+    loaderContainer.classList.remove("active")
+
+    // Complete progress bar
+    completeProgressBar()
+  }
+}
+
+// Start progress bar animation
+function startProgressBar() {
+  const progressBar = document.querySelector(".progress-bar")
+  if (!progressBar) return
+
+  // Reset progress
+  loaderState.progressValue = 0
+  progressBar.style.width = "0%"
+  progressBar.setAttribute("aria-valuenow", "0")
+
+  // Clear any existing interval
+  if (loaderState.progressInterval) {
+    clearInterval(loaderState.progressInterval)
+  }
+
+  // Start new interval
+  loaderState.progressInterval = setInterval(() => {
+    // Increment progress, but slow down as it approaches 90%
+    const increment = loaderState.progressValue < 50 ? 5 : loaderState.progressValue < 80 ? 2 : 0.5
+
+    loaderState.progressValue = Math.min(loaderState.progressValue + increment, 90)
+    progressBar.style.width = `${loaderState.progressValue}%`
+    progressBar.setAttribute("aria-valuenow", loaderState.progressValue.toString())
+
+    // Stop at 90% (will be completed when hideLoader is called)
+    if (loaderState.progressValue >= 90) {
+      clearInterval(loaderState.progressInterval)
+      loaderState.progressInterval = null
     }
-  })
+  }, 100)
+}
 
-  document.getElementById("login-button")?.addEventListener("click", () => {
-    alert("Login functionality will be implemented in the full version.")
-  })
+// Complete progress bar animation
+function completeProgressBar() {
+  const progressBar = document.querySelector(".progress-bar")
+  if (!progressBar) return
 
-  document.getElementById("start-button")?.addEventListener("click", () => {
-    alert("Full functionality will be available in the complete version.")
+  // Clear any existing interval
+  if (loaderState.progressInterval) {
+    clearInterval(loaderState.progressInterval)
+    loaderState.progressInterval = null
+  }
+
+  // Complete to 100%
+  progressBar.style.width = "100%"
+  progressBar.setAttribute("aria-valuenow", "100")
+
+  // Reset after animation completes
+  setTimeout(() => {
+    progressBar.style.transition = "none"
+    progressBar.style.width = "0%"
+    progressBar.setAttribute("aria-valuenow", "0")
+
+    // Re-enable transition after reset
+    setTimeout(() => {
+      progressBar.style.transition = "width 0.2s ease"
+    }, 50)
+  }, 500)
+}
+
+// Simulate initial loading
+function simulateInitialLoading() {
+  // Show progress bar for initial load
+  const progressBar = document.querySelector(".progress-bar")
+  if (progressBar) {
+    progressBar.style.width = "100%"
+    progressBar.setAttribute("aria-valuenow", "100")
+
+    setTimeout(() => {
+      progressBar.style.transition = "none"
+      progressBar.style.width = "0%"
+      progressBar.setAttribute("aria-valuenow", "0")
+
+      setTimeout(() => {
+        progressBar.style.transition = "width 0.2s ease"
+      }, 50)
+    }, 500)
+  }
+}
+
+// Simulate loading process
+function simulateLoadingProcess(
+  duration = 2000,
+  message = "Processing...",
+  subMessage = "This may take a few moments",
+) {
+  return new Promise((resolve) => {
+    showLoader(message, subMessage)
+
+    setTimeout(() => {
+      hideLoader()
+      resolve()
+    }, duration)
   })
 }
+
+// Add button loading state
+function setButtonLoading(button, isLoading, text = "Get Started") {
+  if (!button) return
+
+  if (isLoading) {
+    button.disabled = true
+    button.innerHTML = `<span class="button-loader"></span> Loading...`
+    button.classList.add("active")
+  } else {
+    button.disabled = false
+    button.innerHTML = text
+    button.classList.remove("active")
+  }
+}
+
+// Separate function for event listeners to improve organization
+function addOptimizedEventListeners() {
+  // Theme toggle with visual feedback first
+  const themeToggle = document.getElementById("theme-toggle")
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      // Provide immediate visual feedback
+      themeToggle.classList.add("active")
+
+      // Use requestAnimationFrame to defer non-visual work
+      requestAnimationFrame(() => {
+        const isDarkMode = document.documentElement.classList.contains("dark")
+        if (isDarkMode) {
+          document.documentElement.classList.remove("dark")
+          document.documentElement.style.colorScheme = "light"
+        } else {
+          document.documentElement.classList.add("dark")
+          document.documentElement.style.colorScheme = "dark"
+        }
+
+        // Remove active state after theme change
+        themeToggle.classList.remove("active")
+      })
+    })
+  }
+
+  // Login button with optimized handler
+  const loginButton = document.getElementById("login-button")
+  if (loginButton) {
+    loginButton.addEventListener("click", async () => {
+      // Show loading state
+      setButtonLoading(loginButton, true, "Login")
+
+      try {
+        // Simulate login process with loader
+        await simulateLoadingProcess(1500, "Preparing Login", "Setting up secure connection...")
+
+        // Show message after visual update
+        setTimeout(() => {
+          alert("Login functionality will be implemented in the full version.")
+        }, 10)
+      } finally {
+        // Reset button state
+        setButtonLoading(loginButton, false, "Login")
+      }
+    })
+  }
+
+  // Start button with optimized handler
+  const startButton = document.getElementById("start-button")
+  if (startButton) {
+    startButton.addEventListener("click", async () => {
+      // Show loading state
+      setButtonLoading(startButton, true)
+
+      try {
+        // Simulate multi-step loading process
+        await simulateLoadingProcess(1000, "Initializing", "Setting up your workspace...")
+        await simulateLoadingProcess(1500, "Loading Resources", "Preparing design tools and templates...")
+        await simulateLoadingProcess(800, "Almost Ready", "Finalizing your experience...")
+
+        // Show message after visual update
+        setTimeout(() => {
+          alert("Full functionality will be available in the complete version.")
+        }, 10)
+      } finally {
+        // Reset button state
+        setButtonLoading(startButton, false)
+      }
+    })
+  }
+}
+
+// Add some basic styles for active state
+const style = document.createElement("style")
+style.textContent = `
+  button.active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+`
+document.head.appendChild(style)
 
 // Initialize the app when the DOM is loaded
 if (document.readyState === "loading") {
