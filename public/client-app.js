@@ -1,40 +1,6 @@
 // This file is loaded by the script in page.tsx
 console.log("Initializing client app...")
 
-// Create a function to safely check if localStorage is available
-function isLocalStorageAvailable() {
-  try {
-    const test = "test"
-    localStorage.setItem(test, test)
-    localStorage.removeItem(test)
-    return true
-  } catch (e) {
-    return false
-  }
-}
-
-// Create a function to safely get from localStorage
-function safeGetFromLocalStorage(key, defaultValue) {
-  if (!isLocalStorageAvailable()) return defaultValue
-  try {
-    const item = localStorage.getItem(key)
-    return item ? JSON.parse(item) : defaultValue
-  } catch (e) {
-    console.error("Error getting from localStorage:", e)
-    return defaultValue
-  }
-}
-
-// Create a function to safely set to localStorage
-function safeSetToLocalStorage(key, value) {
-  if (!isLocalStorageAvailable()) return
-  try {
-    localStorage.setItem(key, JSON.stringify(value))
-  } catch (e) {
-    console.error("Error setting to localStorage:", e)
-  }
-}
-
 // Initialize the app
 function initApp() {
   // Get the app root element
@@ -59,7 +25,7 @@ function initApp() {
     <div class="max-w-7xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-4 group">
         <div class="relative h-9 w-9 overflow-hidden rounded-full ring-1 ring-white/10">
-          <img src="/images/logo.png" alt="RowdyRaedon Logo" width="36" height="36" class="object-cover" />
+          <img src="/images/logo.png" alt="RowdyRaedon Logo" width="36" height="36" class="object-cover" onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'white\\' stroke-width=\\'2\\' stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\'%3E%3Ccircle cx=\\'12\\' cy=\\'8\\' r=\\'5\\'/%3E%3Cpath d=\\'M20 21v-2a5 5 0 0 0-5-5H9a5 5 0 0 0-5 5v2\\'/%3E%3C/svg%3E';" />
         </div>
         <div class="flex flex-col">
           <span class="text-xl font-semibold tracking-tight">CopyCoder</span>
@@ -115,7 +81,7 @@ function initApp() {
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-3">
           <div class="relative h-7 w-7 overflow-hidden rounded-full ring-1 ring-white/10">
-            <img src="/images/logo.png" alt="RowdyRaedon Logo" width="28" height="28" class="object-cover" />
+            <img src="/images/logo.png" alt="RowdyRaedon Logo" width="28" height="28" class="object-cover" onerror="this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'white\\' stroke-width=\\'2\\' stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\'%3E%3Ccircle cx=\\'12\\' cy=\\'8\\' r=\\'5\\'/%3E%3Cpath d=\\'M20 21v-2a5 5 0 0 0-5-5H9a5 5 0 0 0-5 5v2\\'/%3E%3C/svg%3E';" />
           </div>
           <p class="text-sm text-gray-500">© ${new Date().getFullYear()} CopyCoder by RowdyRaedon</p>
         </div>
@@ -135,11 +101,9 @@ function initApp() {
     if (isDarkMode) {
       document.documentElement.classList.remove("dark")
       document.documentElement.style.colorScheme = "light"
-      safeSetToLocalStorage("theme", "light")
     } else {
       document.documentElement.classList.add("dark")
       document.documentElement.style.colorScheme = "dark"
-      safeSetToLocalStorage("theme", "dark")
     }
   })
 
@@ -150,73 +114,6 @@ function initApp() {
   document.getElementById("start-button")?.addEventListener("click", () => {
     alert("Full functionality will be available in the complete version.")
   })
-
-  // Apply theme from localStorage
-  const savedTheme = safeGetFromLocalStorage("theme", "dark")
-  if (savedTheme === "dark") {
-    document.documentElement.classList.add("dark")
-    document.documentElement.style.colorScheme = "dark"
-  } else {
-    document.documentElement.classList.remove("dark")
-    document.documentElement.style.colorScheme = "light"
-  }
-
-  // Check URL parameters
-  const urlParams = new URLSearchParams(window.location.search)
-  const error = urlParams.get("error")
-  const login = urlParams.get("login")
-
-  if (error) {
-    showToast("Authentication Error", decodeURIComponent(error), "error")
-  }
-
-  if (login === "success") {
-    showToast("Login Successful", "You have been logged in successfully.", "success")
-  }
-
-  // Clear URL parameters after reading them
-  if (error || login) {
-    window.history.replaceState({}, document.title, window.location.pathname)
-  }
-}
-
-// Simple toast function
-function showToast(title, message, type = "info") {
-  const toast = document.createElement("div")
-  toast.className = `fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg flex items-center ${
-    type === "error"
-      ? "bg-red-900/90 text-white"
-      : type === "success"
-        ? "bg-green-900/90 text-white"
-        : "bg-blue-900/90 text-white"
-  }`
-
-  toast.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2">
-      ${
-        type === "error"
-          ? '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>'
-          : type === "success"
-            ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>'
-            : '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line>'
-      }
-    </svg>
-    <div>
-      <div class="font-medium">${title}</div>
-      <div class="text-sm">${message}</div>
-    </div>
-  `
-
-  document.body.appendChild(toast)
-
-  // Remove toast after 5 seconds
-  setTimeout(() => {
-    toast.style.opacity = "0"
-    toast.style.transition = "opacity 0.5s ease-out"
-    setTimeout(() => {
-      document.body.removeChild(toast)
-    }, 500)
-  }, 5000)
 }
 
 // Initialize the app when the DOM is loaded

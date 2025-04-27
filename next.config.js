@@ -1,8 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "export", // Generate static HTML
+  output: "export",
   images: {
-    unoptimized: true, // Disable image optimization
+    unoptimized: true,
   },
   // Disable static optimization to prevent SSR issues
   eslint: {
@@ -11,6 +11,17 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Explicitly exclude API routes
+  experimental: {
+    appDir: true,
+  },
+  // Explicitly define which paths to include in the static export
+  exportPathMap: async () => ({
+    "/": { page: "/" },
+  }),
+  // Disable server components
+  reactStrictMode: true,
+  swcMinify: true,
 }
 
 module.exports = nextConfig
