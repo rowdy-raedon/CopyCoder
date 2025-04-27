@@ -3,7 +3,7 @@
 import type React from "react"
 import { createContext, useContext, useState, useEffect, useMemo } from "react"
 import type { AppState, AppSettings, UploadedFile, GeneratedPrompt } from "@/types"
-import { getFromLocalStorage, saveToLocalStorage } from "@/lib/utils"
+import { useClientStorage } from "@/components/client-storage-provider"
 
 // Default settings
 const defaultSettings: AppSettings = {
@@ -42,14 +42,28 @@ const AppContext = createContext<AppContextType | undefined>(undefined)
 
 // Provider component
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AppState>(() => {
-    // Load from localStorage if available
-    const savedState = getFromLocalStorage<AppState>("appState", defaultState)
+  // Initialize with default state
+  const [state, setState] = useState<AppState>(defaultState)
+  const [isInitialized, setIsInitialized] = useState(false)
+  const { getItem, setItem } = useClientStorage()
 
-    // Apply theme from saved state
+  // Load state from client storage on mount
+  useEffect(() => {
+    try {
+      const savedState = getItem<AppState>("appState", defaultState)
+      setState(savedState)
+    } catch (error) {
+      console.error("Failed to load app state:", error)
+      setState(defaultState)
+    }
+
+    setIsInitialized(true)
+
+    // Apply theme
     if (typeof window !== "undefined") {
       const root = window.document.documentElement
-      if (savedState.settings.theme === "dark") {
+      const isDarkMode = state.settings.theme === "dark"
+      if (isDarkMode) {
         root.classList.add("dark")
         root.style.colorScheme = "dark"
       } else {
@@ -57,14 +71,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         root.style.colorScheme = "light"
       }
     }
+  }, [getItem])
 
-    return savedState
-  })
-
-  // Save state to localStorage when it changes
+  // Save state to client storage when it changes
   useEffect(() => {
-    saveToLocalStorage("appState", state)
-  }, [state])
+    if (isInitialized) {
+      try {
+        setItem("appState", state)
+      } catch (error) {
+        console.error("Failed to save app state:", error)
+      }
+    }
+  }, [state, setItem, isInitialized])
 
   // State update functions
   const setCurrentFile = (file: UploadedFile | null) => {
@@ -144,7 +162,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   }
 
   // Memoize context value to prevent unnecessary re-renders
-  const contextValue = useMemo(
+  const contextValue = useMemo<AppContextType>(
     () => ({
       state,
       setCurrentFile,
