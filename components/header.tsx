@@ -1,13 +1,15 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
-import { Github, Moon, Sun } from "lucide-react"
+import { Github, Moon, Sun, AlertCircle, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { LoginModal } from "@/components/login-modal"
 import { UserProfile } from "@/components/user-profile"
+import { useToast } from "@/components/ui/use-toast"
 
 interface HeaderProps {
   isDarkMode: boolean
@@ -18,6 +20,30 @@ export function Header({ isDarkMode, toggleTheme }: HeaderProps) {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const searchParams = useSearchParams()
+  const { toast } = useToast()
+
+  // Check URL parameters for auth messages
+  useEffect(() => {
+    const error = searchParams.get("error")
+    const login = searchParams.get("login")
+
+    if (error) {
+      toast({
+        title: "Authentication Error",
+        description: decodeURIComponent(error),
+        variant: "destructive",
+      })
+    }
+
+    if (login === "success") {
+      toast({
+        title: "Login Successful",
+        description: "You have been logged in successfully.",
+        variant: "default",
+      })
+    }
+  }, [searchParams, toast])
 
   // Check if user is already logged in
   useEffect(() => {
@@ -49,6 +75,10 @@ export function Header({ isDarkMode, toggleTheme }: HeaderProps) {
 
       if (response.ok) {
         setUser(null)
+        toast({
+          title: "Logged Out",
+          description: "You have been logged out successfully.",
+        })
       }
     } catch (error) {
       console.error("Logout error:", error)
@@ -110,6 +140,33 @@ export function Header({ isDarkMode, toggleTheme }: HeaderProps) {
       </motion.header>
 
       <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+
+      {/* Status messages */}
+      <AnimatePresence>
+        {searchParams.get("error") && (
+          <motion.div
+            className="fixed bottom-4 right-4 bg-red-900/90 text-white px-4 py-3 rounded-lg shadow-lg flex items-center"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <AlertCircle className="h-5 w-5 mr-2" />
+            <span>{decodeURIComponent(searchParams.get("error") || "")}</span>
+          </motion.div>
+        )}
+
+        {searchParams.get("login") === "success" && (
+          <motion.div
+            className="fixed bottom-4 right-4 bg-green-900/90 text-white px-4 py-3 rounded-lg shadow-lg flex items-center"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+          >
+            <CheckCircle2 className="h-5 w-5 mr-2" />
+            <span>Login successful!</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }
