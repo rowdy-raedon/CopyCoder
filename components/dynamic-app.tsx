@@ -4,19 +4,25 @@ import { useState, useCallback, useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 
-import { Header } from "@/components/header"
+import { Sidebar } from "@/components/sidebar"
 import { Footer } from "@/components/footer"
-import { MultiFileUpload } from "@/components/multi-file-upload"
 import { QuickTools } from "@/components/quick-tools"
 import { PromptDisplay } from "@/components/prompt-display"
 import { ControlPanel } from "@/components/control-panel"
-import { ProjectInfoForm, type ProjectInfo } from "@/components/project-info-form"
+import type { ProjectInfo } from "@/components/project-info-form"
+import { AddPictures } from "@/components/add-pictures"
+import { ProjectInfoSection } from "@/components/project-info-section"
 import type { UploadedImage, GeneratedPrompt, AnalysisSettings } from "@/types"
 import { generatePrompt } from "@/lib/prompt-generator"
+import { Menu } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export function DynamicApp() {
   // Add a fade-in animation
   const [isVisible, setIsVisible] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState("generator")
 
   useEffect(() => {
     // Small delay to ensure smooth transition from skeleton
@@ -24,7 +30,20 @@ export function DynamicApp() {
       setIsVisible(true)
     }, 100)
 
-    return () => clearTimeout(timer)
+    // Check if we should collapse sidebar by default on smaller screens
+    const checkScreenSize = () => {
+      if (typeof window !== "undefined") {
+        setSidebarCollapsed(window.innerWidth < 1024)
+      }
+    }
+
+    checkScreenSize()
+    window.addEventListener("resize", checkScreenSize)
+
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener("resize", checkScreenSize)
+    }
   }, [])
 
   // State
@@ -130,44 +149,118 @@ export function DynamicApp() {
     [uploadedImages, toast, projectInfo],
   )
 
-  return (
-    <div
-      className={`min-h-screen bg-[#0f1117] text-white font-sans antialiased transition-opacity duration-500 ${
-        isVisible ? "opacity-100" : "opacity-0"
-      }`}
-    >
-      <Header isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+  // Calculate sidebar width for content margin
+  const sidebarWidth = sidebarCollapsed ? 70 : 240
 
-      <main className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          {/* Left Panel - 3 columns */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Multi-File Upload Area */}
-            <MultiFileUpload onImagesChange={handleImagesChange} maxFiles={50} />
+  // Handle sidebar navigation
+  const handleAddPictures = () => {
+    setActiveSection("add-pictures")
+  }
 
-            {/* Project Information Form */}
-            <ProjectInfoForm onInfoChange={handleProjectInfoChange} />
+  const handleProjectInfo = () => {
+    setActiveSection("project-info")
+  }
 
+  // Render the active section content
+  const renderActiveSection = () => {
+    switch (activeSection) {
+      case "add-pictures":
+        return <AddPictures onImagesChange={handleImagesChange} images={uploadedImages} />
+      case "project-info":
+        return <ProjectInfoSection onInfoChange={handleProjectInfoChange} projectInfo={projectInfo} />
+      case "generator":
+      default:
+        return (
+          <div className="space-y-6">
             {/* Quick Access Tools */}
             <QuickTools />
 
             {/* Generated Prompt Display */}
             <PromptDisplay prompt={generatedPrompt} isGenerating={isGenerating} />
           </div>
+        )
+    }
+  }
 
-          {/* Right Panel - 2 columns */}
-          <div className="lg:col-span-2">
-            <ControlPanel
-              onGenerate={handleGeneratePrompt}
-              isGenerating={isGenerating}
-              hasImages={uploadedImages.length > 0}
-              imageCount={uploadedImages.length}
+  return (
+    <div
+      className={`min-h-screen bg-[#0f1117] text-white font-sans antialiased transition-opacity duration-500 ${
+        isVisible ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      {/* Sidebar for desktop */}
+      <div className="hidden lg:block">
+        <Sidebar
+          isDarkMode={isDarkMode}
+          toggleTheme={toggleTheme}
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
+          onAddPictures={handleAddPictures}
+          onProjectInfo={handleProjectInfo}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+        />
+      </div>
+
+      {/* Mobile menu button and overlay */}
+      <div className="lg:hidden fixed top-0 left-0 z-40 p-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="bg-[#1c1f26]/80 hover:bg-[#1c1f26] text-white"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Mobile sidebar */}
+      {mobileMenuOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
+          <div className="lg:hidden">
+            <Sidebar
+              isDarkMode={isDarkMode}
+              toggleTheme={toggleTheme}
+              collapsed={false}
+              setCollapsed={() => setMobileMenuOpen(false)}
+              onAddPictures={handleAddPictures}
+              onProjectInfo={handleProjectInfo}
+              activeSection={activeSection}
+              setActiveSection={setActiveSection}
             />
           </div>
-        </div>
-      </main>
+        </>
+      )}
 
-      <Footer />
+      {/* Main content */}
+      <div className={`transition-all duration-300 min-h-screen`} style={{ marginLeft: `${sidebarWidth}px` }}>
+        <main className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
+          {/* Page title */}
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-white">UI Prompt Generator</h1>
+            <p className="text-gray-400 mt-1">Upload UI designs and generate detailed implementation specifications</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            {/* Left Panel - 3 columns */}
+            <div className="lg:col-span-3">{renderActiveSection()}</div>
+
+            {/* Right Panel - 2 columns */}
+            <div className="lg:col-span-2">
+              <ControlPanel
+                onGenerate={handleGeneratePrompt}
+                isGenerating={isGenerating}
+                hasImages={uploadedImages.length > 0}
+                imageCount={uploadedImages.length}
+              />
+            </div>
+          </div>
+        </main>
+
+        <Footer />
+      </div>
+
       <Toaster />
     </div>
   )
