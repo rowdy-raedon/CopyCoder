@@ -62,23 +62,13 @@ export function ControlPanel({ onGenerate, isGenerating, hasImages, imageCount }
 
   return (
     <motion.div
-      className="bg-gradient-to-b from-[#1c1f26]/80 to-[#1c1f26] rounded-2xl p-8 border border-[#2a2f3a]/50 h-full flex flex-col"
+      className="bg-gradient-to-b from-[#1c1f26]/80 to-[#1c1f26] rounded-2xl p-6 border border-[#2a2f3a]/50"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="space-y-8">
-        {/* Image count indicator */}
-        {hasImages && (
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-300">Images selected</span>
-            <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">
-              {imageCount} {imageCount === 1 ? "image" : "images"}
-            </Badge>
-          </div>
-        )}
-
-        {/* Analysis Focus */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left column - Analysis Focus */}
         <div className="space-y-3">
           <label className="text-sm text-gray-300 flex items-center gap-2 font-medium">
             Choose analysis focus
@@ -101,8 +91,8 @@ export function ControlPanel({ onGenerate, isGenerating, hasImages, imageCount }
           </Select>
         </div>
 
-        {/* Temperature Slider */}
-        <div className="space-y-5 pt-2">
+        {/* Middle column - Temperature */}
+        <div className="space-y-3">
           <div className="flex justify-between items-center">
             <label className="text-sm text-gray-300 font-medium">Temperature</label>
             <span className="text-xs text-blue-400 font-mono bg-blue-500/10 px-2 py-1 rounded-md">
@@ -122,37 +112,40 @@ export function ControlPanel({ onGenerate, isGenerating, hasImages, imageCount }
           </div>
         </div>
 
-        {/* Processing Options */}
-        <div className="space-y-4 pt-2">
+        {/* Right column - Processing Options */}
+        <div className="space-y-3">
           <h4 className="text-sm font-medium text-gray-300">Processing Options</h4>
-          <div className="grid grid-cols-1 gap-3">
+          <div className="grid grid-cols-3 gap-2">
             {processingOptions.map((option) => (
               <div
                 key={option.value}
-                className={`p-4 rounded-lg ${
+                className={`p-2 rounded-lg ${
                   settings.processingOption === option.value
                     ? "bg-blue-900/30 border-blue-500/50"
                     : "bg-[#0f1117]/80 border-[#2a2f3a]/50"
-                } cursor-pointer hover:border-blue-500/30 transition-all border`}
+                } cursor-pointer hover:border-blue-500/30 transition-all border flex flex-col items-center justify-center text-center h-24`}
                 onClick={() => setSettings((prev) => ({ ...prev, processingOption: option.value }))}
               >
-                <div className="flex items-center gap-3">
-                  {option.icon}
-                  <div>
-                    <span className="text-sm font-medium block">{option.label}</span>
-                    <span className="text-xs text-gray-400">{option.description}</span>
-                  </div>
-                </div>
+                <div className="mb-2">{option.icon}</div>
+                <span className="text-sm font-medium block">{option.label}</span>
+                <span className="text-xs text-gray-400 line-clamp-1">{option.description}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Generate Button */}
-      <div className="mt-auto pt-10">
+      {/* Image count and Generate Button */}
+      <div className="mt-6 flex items-center justify-between">
+        <div>
+          {hasImages && (
+            <Badge variant="outline" className="bg-blue-500/10 text-blue-400 border-blue-500/20">
+              {imageCount} {imageCount === 1 ? "image" : "images"} selected
+            </Badge>
+          )}
+        </div>
         <Button
-          className="w-full bg-gradient-to-r from-blue-600/90 to-blue-500/90 hover:from-blue-500 hover:to-blue-400 text-white py-6 text-base font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-900/20 hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="bg-gradient-to-r from-blue-600/90 to-blue-500/90 hover:from-blue-500 hover:to-blue-400 text-white py-6 px-8 text-base font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-blue-900/20 hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           onClick={handleGenerate}
           disabled={isGenerating || !hasImages}
         >
@@ -165,9 +158,9 @@ export function ControlPanel({ onGenerate, isGenerating, hasImages, imageCount }
             "Generate Prompt"
           )}
         </Button>
-
-        {!hasImages && <p className="text-xs text-gray-500 text-center mt-3">Please upload at least one image first</p>}
       </div>
+
+      {!hasImages && <p className="text-xs text-gray-500 text-center mt-3">Please upload at least one image first</p>}
     </motion.div>
   )
 }

@@ -219,21 +219,17 @@ export function DynamicApp() {
       case "generator":
       default:
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Left Panel - 3 columns - Generated Prompt Display */}
-            <div className="lg:col-span-3">
-              <PromptDisplay prompt={generatedPrompt} isGenerating={isGenerating} />
-            </div>
+          <div className="space-y-6">
+            {/* Control Panel - Top */}
+            <ControlPanel
+              onGenerate={handleGeneratePrompt}
+              isGenerating={isGenerating}
+              hasImages={uploadedImages.length > 0}
+              imageCount={uploadedImages.length}
+            />
 
-            {/* Right Panel - 2 columns - Control Panel */}
-            <div className="lg:col-span-2">
-              <ControlPanel
-                onGenerate={handleGeneratePrompt}
-                isGenerating={isGenerating}
-                hasImages={uploadedImages.length > 0}
-                imageCount={uploadedImages.length}
-              />
-            </div>
+            {/* Generated Prompt Display - Bottom */}
+            <PromptDisplay prompt={generatedPrompt} isGenerating={isGenerating} />
           </div>
         )
     }
