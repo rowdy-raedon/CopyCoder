@@ -6,12 +6,14 @@ import { Toaster } from "@/components/ui/toaster"
 
 import { Sidebar } from "@/components/sidebar"
 import { Footer } from "@/components/footer"
-import { QuickTools } from "@/components/quick-tools"
 import { PromptDisplay } from "@/components/prompt-display"
 import { ControlPanel } from "@/components/control-panel"
 import type { ProjectInfo } from "@/components/project-info-form"
 import { AddPictures } from "@/components/add-pictures"
 import { ProjectInfoSection } from "@/components/project-info-section"
+import { QuickToolsSection } from "@/components/quick-tools-section"
+import { PromptsSection } from "@/components/prompts-section"
+import { SettingsSection } from "@/components/settings-section"
 import type { UploadedImage, GeneratedPrompt, AnalysisSettings } from "@/types"
 import { generatePrompt } from "@/lib/prompt-generator"
 import { Menu } from "lucide-react"
@@ -161,6 +163,46 @@ export function DynamicApp() {
     setActiveSection("project-info")
   }
 
+  // Get the title for the current section
+  const getSectionTitle = () => {
+    switch (activeSection) {
+      case "generator":
+        return "UI Prompt Generator"
+      case "add-pictures":
+        return "Add Pictures"
+      case "project-info":
+        return "Project Information"
+      case "quick-tools":
+        return "Quick Access Tools"
+      case "prompts":
+        return "Saved Prompts"
+      case "settings":
+        return "Settings"
+      default:
+        return "CopyCoder"
+    }
+  }
+
+  // Get the description for the current section
+  const getSectionDescription = () => {
+    switch (activeSection) {
+      case "generator":
+        return "Generate detailed implementation specifications from UI designs"
+      case "add-pictures":
+        return "Upload and manage images for prompt generation"
+      case "project-info":
+        return "Edit project details and custom prompt instructions"
+      case "quick-tools":
+        return "Access external tools to enhance your development workflow"
+      case "prompts":
+        return "View and edit your saved prompts"
+      case "settings":
+        return "Configure application settings and preferences"
+      default:
+        return "AI-powered UI implementation assistant"
+    }
+  }
+
   // Render the active section content
   const renderActiveSection = () => {
     switch (activeSection) {
@@ -168,19 +210,26 @@ export function DynamicApp() {
         return <AddPictures onImagesChange={handleImagesChange} images={uploadedImages} />
       case "project-info":
         return <ProjectInfoSection onInfoChange={handleProjectInfoChange} projectInfo={projectInfo} />
+      case "quick-tools":
+        return <QuickToolsSection />
+      case "prompts":
+        return <PromptsSection generatedPrompt={generatedPrompt} />
+      case "settings":
+        return <SettingsSection isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       case "generator":
       default:
         return (
           <div className="space-y-6">
-            {/* Quick Access Tools */}
-            <QuickTools />
-
             {/* Generated Prompt Display */}
             <PromptDisplay prompt={generatedPrompt} isGenerating={isGenerating} />
           </div>
         )
     }
   }
+
+  // Determine if control panel should be shown
+  const showControlPanel =
+    activeSection === "generator" || activeSection === "add-pictures" || activeSection === "project-info"
 
   return (
     <div
@@ -238,23 +287,25 @@ export function DynamicApp() {
         <main className="max-w-7xl mx-auto px-4 py-10 sm:px-6 lg:px-8">
           {/* Page title */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-white">UI Prompt Generator</h1>
-            <p className="text-gray-400 mt-1">Upload UI designs and generate detailed implementation specifications</p>
+            <h1 className="text-2xl font-bold text-white">{getSectionTitle()}</h1>
+            <p className="text-gray-400 mt-1">{getSectionDescription()}</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Left Panel - 3 columns */}
-            <div className="lg:col-span-3">{renderActiveSection()}</div>
+            {/* Left Panel - 3 columns or full width depending on section */}
+            <div className={showControlPanel ? "lg:col-span-3" : "lg:col-span-5"}>{renderActiveSection()}</div>
 
-            {/* Right Panel - 2 columns */}
-            <div className="lg:col-span-2">
-              <ControlPanel
-                onGenerate={handleGeneratePrompt}
-                isGenerating={isGenerating}
-                hasImages={uploadedImages.length > 0}
-                imageCount={uploadedImages.length}
-              />
-            </div>
+            {/* Right Panel - 2 columns, only shown for certain sections */}
+            {showControlPanel && (
+              <div className="lg:col-span-2">
+                <ControlPanel
+                  onGenerate={handleGeneratePrompt}
+                  isGenerating={isGenerating}
+                  hasImages={uploadedImages.length > 0}
+                  imageCount={uploadedImages.length}
+                />
+              </div>
+            )}
           </div>
         </main>
 

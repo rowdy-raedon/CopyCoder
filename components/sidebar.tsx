@@ -2,10 +2,8 @@
 import Link from "next/link"
 import Image from "next/image"
 import {
-  Home,
   Settings,
   Code,
-  ImageIcon,
   FileText,
   ChevronLeft,
   ChevronRight,
@@ -14,6 +12,7 @@ import {
   Sun,
   PlusCircle,
   Info,
+  Zap,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { motion } from "framer-motion"
@@ -43,12 +42,6 @@ export function Sidebar({
 }: SidebarProps) {
   const navItems = [
     {
-      name: "Dashboard",
-      icon: <Home className="h-5 w-5" />,
-      action: () => setActiveSection("dashboard"),
-      id: "dashboard",
-    },
-    {
       name: "Generator",
       icon: <Code className="h-5 w-5" />,
       action: () => setActiveSection("generator"),
@@ -56,7 +49,12 @@ export function Sidebar({
     },
     { name: "Add Pictures", icon: <PlusCircle className="h-5 w-5" />, action: onAddPictures, id: "add-pictures" },
     { name: "Project Info", icon: <Info className="h-5 w-5" />, action: onProjectInfo, id: "project-info" },
-    { name: "Images", icon: <ImageIcon className="h-5 w-5" />, action: () => setActiveSection("images"), id: "images" },
+    {
+      name: "Quick Tools",
+      icon: <Zap className="h-5 w-5" />,
+      action: () => setActiveSection("quick-tools"),
+      id: "quick-tools",
+    },
     {
       name: "Prompts",
       icon: <FileText className="h-5 w-5" />,

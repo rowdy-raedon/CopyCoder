@@ -22,7 +22,7 @@ export function SkeletonUI() {
         {/* Navigation items */}
         <div className="py-6 px-2">
           <div className="flex flex-col gap-2">
-            {[...Array(5)].map((_, i) => (
+            {[...Array(6)].map((_, i) => (
               <Skeleton key={i} className="h-10 w-full rounded-lg" />
             ))}
           </div>
@@ -53,62 +53,7 @@ export function SkeletonUI() {
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* Left Panel - 3 columns */}
             <div className="lg:col-span-3 space-y-6">
-              {/* File Upload Area Skeleton */}
-              <div className="bg-gradient-to-b from-[#1c1f26]/80 to-[#1c1f26] rounded-2xl border border-[#2a2f3a]/50 p-8 h-[340px] flex flex-col items-center justify-center gap-6">
-                <Skeleton className="h-16 w-16 rounded-full" />
-                <div className="text-center space-y-2 w-full">
-                  <Skeleton className="h-6 w-48 mx-auto" />
-                  <Skeleton className="h-4 w-64 mx-auto" />
-                </div>
-                <Skeleton className="h-10 w-32 rounded-full" />
-              </div>
-
-              {/* Project Information Form Skeleton */}
-              <div className="bg-gradient-to-b from-[#1c1f26]/80 to-[#1c1f26] rounded-2xl border border-[#2a2f3a]/50 p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Skeleton className="h-1 w-1 rounded-full" />
-                  <Skeleton className="h-5 w-40" />
-                </div>
-
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-10 w-full rounded-md" />
-                    </div>
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-10 w-full rounded-md" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-10 w-full rounded-md" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-40" />
-                    <Skeleton className="h-24 w-full rounded-md" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Quick Tools Skeleton */}
-              <div className="bg-gradient-to-b from-[#1c1f26]/80 to-[#1c1f26] rounded-2xl border border-[#2a2f3a]/50 p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <Skeleton className="h-5 w-32" />
-                  <Skeleton className="h-4 w-24" />
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-8 w-24 rounded-full" />
-                  ))}
-                </div>
-              </div>
-
-              {/* Prompt Display Skeleton */}
+              {/* Content Skeleton */}
               <div className="bg-gradient-to-b from-[#1c1f26]/80 to-[#1c1f26] rounded-2xl border border-[#2a2f3a]/50 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
