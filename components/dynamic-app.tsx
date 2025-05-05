@@ -219,17 +219,25 @@ export function DynamicApp() {
       case "generator":
       default:
         return (
-          <div className="space-y-6">
-            {/* Generated Prompt Display */}
-            <PromptDisplay prompt={generatedPrompt} isGenerating={isGenerating} />
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            {/* Left Panel - 3 columns - Generated Prompt Display */}
+            <div className="lg:col-span-3">
+              <PromptDisplay prompt={generatedPrompt} isGenerating={isGenerating} />
+            </div>
+
+            {/* Right Panel - 2 columns - Control Panel */}
+            <div className="lg:col-span-2">
+              <ControlPanel
+                onGenerate={handleGeneratePrompt}
+                isGenerating={isGenerating}
+                hasImages={uploadedImages.length > 0}
+                imageCount={uploadedImages.length}
+              />
+            </div>
           </div>
         )
     }
   }
-
-  // Determine if control panel should be shown
-  const showControlPanel =
-    activeSection === "generator" || activeSection === "add-pictures" || activeSection === "project-info"
 
   return (
     <div
@@ -291,21 +299,9 @@ export function DynamicApp() {
             <p className="text-gray-400 mt-1">{getSectionDescription()}</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            {/* Left Panel - 3 columns or full width depending on section */}
-            <div className={showControlPanel ? "lg:col-span-3" : "lg:col-span-5"}>{renderActiveSection()}</div>
-
-            {/* Right Panel - 2 columns, only shown for certain sections */}
-            {showControlPanel && (
-              <div className="lg:col-span-2">
-                <ControlPanel
-                  onGenerate={handleGeneratePrompt}
-                  isGenerating={isGenerating}
-                  hasImages={uploadedImages.length > 0}
-                  imageCount={uploadedImages.length}
-                />
-              </div>
-            )}
+          <div className="grid grid-cols-1 gap-8">
+            {/* Main content area - full width */}
+            <div className="w-full">{renderActiveSection()}</div>
           </div>
         </main>
 

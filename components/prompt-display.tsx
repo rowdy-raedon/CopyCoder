@@ -61,7 +61,7 @@ export function PromptDisplay({ prompt, isGenerating }: PromptDisplayProps) {
   }
 
   return (
-    <div className="bg-gradient-to-b from-[#1c1f26]/80 to-[#1c1f26] rounded-2xl border border-[#2a2f3a]/50 p-6">
+    <div className="bg-gradient-to-b from-[#1c1f26]/80 to-[#1c1f26] rounded-2xl border border-[#2a2f3a]/50 p-6 h-full">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <div className="h-1 w-1 rounded-full bg-blue-500"></div>
